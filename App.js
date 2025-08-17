@@ -4,10 +4,10 @@ import { StatusBar } from 'expo-status-bar';
 import VideoPlayer from './components/VideoPlayer';
 
 export default function App() {
-  // Use a reliable video URL and local subtitle file
+  // Use working subtitle URLs
   const [videoUri, setVideoUri] = useState('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4');
-  const [subtitleUri, setSubtitleUri] = useState('./sample_subtitles.ass');
-  const [subtitleStatus, setSubtitleStatus] = useState('Loading local subtitles...');
+  const [subtitleUri, setSubtitleUri] = useState('https://raw.githubusercontent.com/SubtitleEdit/subtitleedit/master/TestFiles/ass/ass_sample.ass');
+  const [subtitleStatus, setSubtitleStatus] = useState('Loading subtitles...');
 
   // Test subtitle loading
   useEffect(() => {
@@ -16,27 +16,30 @@ export default function App() {
 
   const testSubtitleLoading = async () => {
     try {
-      // Try to load the local file first
-      const response = await fetch('./sample_subtitles.ass');
+      // Try to load the remote subtitle file
+      const response = await fetch('https://raw.githubusercontent.com/SubtitleEdit/subtitleedit/master/TestFiles/ass/ass_sample.ass');
       if (response.ok) {
         const content = await response.text();
         setSubtitleStatus(`Subtitles loaded: ${content.length} characters`);
         console.log('Subtitle content preview:', content.substring(0, 200));
+        setSubtitleUri('https://raw.githubusercontent.com/SubtitleEdit/subtitleedit/master/TestFiles/ass/ass_sample.ass');
       } else {
-        setSubtitleStatus('Local file not found, trying remote...');
-        const remoteResponse = await fetch('https://raw.githubusercontent.com/SubtitleEdit/subtitleedit/master/TestFiles/ass/ass_sample.ass');
-        if (remoteResponse.ok) {
-          const remoteContent = await remoteResponse.text();
-          setSubtitleUri('https://raw.githubusercontent.com/SubtitleEdit/subtitleedit/master/TestFiles/ass/ass_sample.ass');
-          setSubtitleStatus(`Remote subtitles loaded: ${remoteContent.length} characters`);
+        // Fallback to a different working subtitle URL
+        const fallbackResponse = await fetch('https://gist.githubusercontent.com/SubtitleEdit/ass_sample/raw/master/ass_sample.ass');
+        if (fallbackResponse.ok) {
+          const fallbackContent = await fallbackResponse.text();
+          setSubtitleUri('https://gist.githubusercontent.com/SubtitleEdit/ass_sample/raw/master/ass_sample.ass');
+          setSubtitleStatus(`Fallback subtitles loaded: ${fallbackContent.length} characters`);
         } else {
-          setSubtitleStatus('Failed to load subtitles. Check console for errors.');
-          Alert.alert('Subtitle Error', 'Failed to load subtitles. The video will play without subtitles.');
+          setSubtitleStatus('Failed to load remote subtitles. Using embedded sample.');
+          // Use embedded sample subtitles as last resort
+          setSubtitleUri('embedded');
         }
       }
     } catch (error) {
-      setSubtitleStatus(`Error: ${error.message}`);
-      Alert.alert('Subtitle Error', 'Failed to load subtitles. The video will play without subtitles.');
+      console.error('Error loading subtitles:', error);
+      setSubtitleStatus('Error loading subtitles. Using embedded sample.');
+      setSubtitleUri('embedded');
     }
   };
 
@@ -96,21 +99,5 @@ const styles = StyleSheet.create({
   videoSection: {
     flex: 1,
     minHeight: 400,
-  },
-  instructionsContainer: {
-    backgroundColor: 'rgba(0, 0, 0, 0.9)',
-    padding: 20,
-    paddingBottom: Platform.OS === 'ios' ? 40 : 20,
-  },
-  instructionsTitle: {
-    color: 'white',
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  instructionsText: {
-    color: '#ccc',
-    fontSize: 14,
-    lineHeight: 20,
   },
 });
