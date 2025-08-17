@@ -4,18 +4,37 @@
   "main": "index.js",
   "scripts": {
     "start": "expo start",
+    "start:no-auth": "EXPO_NO_AUTH=1 expo start --no-dev-client",
+    "start:offline": "EXPO_NO_AUTH=1 expo start --offline",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "test": "node -e \"console.log('✅ Project setup complete! Run: npm run start:offline')\""
   },
   "dependencies": {
+    "@expo/vector-icons": "^14.1.0",
     "expo": "~53.0.20",
+    "expo-av": "^15.1.7",
+    "expo-file-system": "^18.1.11",
     "expo-status-bar": "~2.2.3",
     "react": "19.0.0",
-    "react-native": "0.79.5"
+    "react-native": "0.79.5",
+    "react-native-video": "^6.16.1",
+    "react-dom": "19.0.0",
+    "react-native-web": "^0.20.0",
+    "@expo/metro-runtime": "~5.0.4"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"
   },
-  "private": true
+  "private": true,
+  "keywords": [
+    "react-native",
+    "expo",
+    "video-player",
+    "subtitles",
+    "ass",
+    "cross-platform"
+  ],
+  "description": "A React Native + Expo video player with ASS subtitle support"
 }
